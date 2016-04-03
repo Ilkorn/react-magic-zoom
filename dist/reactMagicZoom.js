@@ -4,8 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
@@ -47,32 +45,6 @@ var MagicZoom = function (_React$Component) {
         _this.handleMouseEnterOnImage = _this.handleMouseEnterOnImage.bind(_this);
 
         _this.state = {
-
-            // temporary for testing
-            options: {
-
-                cursorFrame: {
-                    // can be {heigth: int, width: int} or auto string
-                    size: 'auto',
-
-                    // ablility of frame moving out of original image
-                    overflow: true
-                },
-
-                reflection: {
-
-                    // Value:   'auto' - clone of original image
-                    //          {heigth: int, width: int} - dimention
-                    size: 'auto',
-
-                    // Value:   'left', 'right', 'top', 'bottom' - position of
-                    //                                              reflection
-                    position: 'left',
-
-                    // Value: @flaot - scale coefficient
-                    scale: 2
-                }
-            },
 
             elementsState: {
                 imageWrapper: {
@@ -130,51 +102,21 @@ var MagicZoom = function (_React$Component) {
     }, {
         key: 'componentWillUnmount',
         value: function componentWillUnmount() {}
+
+        // Initialization methods
+
     }, {
         key: 'initializeComponentState',
         value: function initializeComponentState() {
+            // ToDo move changable props to state
+            // preset default option by component type
             var state = this.state;
-
-            if (this.props.cursorFrame) {
-                if (typeof this.props.cursorFrame.size === 'string' || _typeof(this.props.cursorFrame.size) === 'object') {
-
-                    // check params
-                    state.options.cursorFrame.size = this.props.cursorFrame.size;
-                }
-
-                if (typeof this.props.cursorFrame.overflow === 'boolean') {
-
-                    // check params
-                    state.options.cursorFrame.overflow = this.props.cursorFrame.overflow;
-                }
-            }
-
-            if (this.props.reflection) {
-                if (typeof this.props.reflection.size === 'string' || _typeof(this.props.reflection.size) === 'object') {
-
-                    // check params
-                    state.options.reflection.size = this.props.reflection.size;
-                }
-
-                if (typeof this.props.reflection.scale === 'number') {
-
-                    // check params
-                    state.options.reflection.scale = this.props.cursorFrame.scale;
-                }
-
-                if (typeof this.props.reflection.position === 'string') {
-
-                    // check params
-                    state.options.reflection.position = this.props.cursorFrame.position;
-                }
-            }
-
             this.setState(state);
         }
     }, {
         key: 'initializeReflection',
         value: function initializeReflection() {
-            if (this.state.options.reflection.size == 'auto' && this.$image) {
+            if (this.props.reflection.size === 'auto' && this.$image) {
                 var state = this.state;
 
                 state.elementsState.reflection.size.height = this.$image.height;
@@ -213,8 +155,8 @@ var MagicZoom = function (_React$Component) {
                 };
             } else if (cursorFrameState.type === 'auto') {
                 cursorFrameState.size = {
-                    height: this.$image.height / this.state.options.reflection.scale,
-                    width: this.$image.width / this.state.options.reflection.scale
+                    height: this.$image.height / this.props.reflection.scale,
+                    width: this.$image.width / this.props.reflection.scale
                 };
 
                 cursorFrameState.position = {
@@ -228,6 +170,9 @@ var MagicZoom = function (_React$Component) {
             state.elementsState.cursorFrame = cursorFrameState;
             this.setState(state);
         }
+
+        // Handler methids
+
     }, {
         key: 'handleImageLoad',
         value: function handleImageLoad(event) {
@@ -260,10 +205,30 @@ var MagicZoom = function (_React$Component) {
             this.setState(state);
         }
     }, {
+        key: 'handleMouseLeaveFromImage',
+        value: function handleMouseLeaveFromImage(event) {
+            var state = this.state;
+            state.elementsState.reflection.disabled = true;
+            this.setState(state);
+        }
+    }, {
+        key: 'handleMouseEnterOnImage',
+        value: function handleMouseEnterOnImage(event) {
+            var state = this.state;
+            state.elementsState.reflection.disabled = false;
+
+            // should update cursor postion
+
+            this.setState(state);
+        }
+
+        // Calculators
+
+    }, {
         key: 'calculateMouseAndCursorPositionByImage',
         value: function calculateMouseAndCursorPositionByImage(state, nativeEvent, reflectionElement, cursorFrame) {
-            state.elementsState.reflection.background.position.x = -(nativeEvent.offsetX * state.options.reflection.scale - reflectionElement.offsetWidth / 2);
-            state.elementsState.reflection.background.position.y = -(nativeEvent.offsetY * state.options.reflection.scale - reflectionElement.offsetHeight / 2);
+            state.elementsState.reflection.background.position.x = -(nativeEvent.offsetX * this.props.reflection.scale - reflectionElement.offsetWidth / 2);
+            state.elementsState.reflection.background.position.y = -(nativeEvent.offsetY * this.props.reflection.scale - reflectionElement.offsetHeight / 2);
 
             // frame
             if (!state.elementsState.cursorFrame.overflow) {
@@ -307,9 +272,9 @@ var MagicZoom = function (_React$Component) {
                     }
                 }
 
-                state.elementsState.reflection.background.position.x = -(cursorRelatedPosition.x * state.options.reflection.scale - this.state.elementsState.reflection.size.width / 2);
+                state.elementsState.reflection.background.position.x = -(cursorRelatedPosition.x * this.props.reflection.scale - this.state.elementsState.reflection.size.width / 2);
 
-                state.elementsState.reflection.background.position.y = -(cursorRelatedPosition.y * state.options.reflection.scale - this.state.elementsState.reflection.size.height / 2);
+                state.elementsState.reflection.background.position.y = -(cursorRelatedPosition.y * this.props.reflection.scale - this.state.elementsState.reflection.size.height / 2);
             }
         }
     }, {
@@ -341,23 +306,9 @@ var MagicZoom = function (_React$Component) {
                 state.elementsState.cursorFrame.position.y = nativeEvent.target.offsetTop + nativeEvent.offsetY;
             }
         }
-    }, {
-        key: 'handleMouseLeaveFromImage',
-        value: function handleMouseLeaveFromImage(event) {
-            var state = this.state;
-            state.elementsState.reflection.disabled = true;
-            this.setState(state);
-        }
-    }, {
-        key: 'handleMouseEnterOnImage',
-        value: function handleMouseEnterOnImage(event) {
-            var state = this.state;
-            state.elementsState.reflection.disabled = false;
 
-            // should update cursor postion
+        // Utils methods Todo: apply widthOffset fix
 
-            this.setState(state);
-        }
     }, {
         key: 'getReflectionImageDOM',
         value: function getReflectionImageDOM() {
@@ -368,6 +319,9 @@ var MagicZoom = function (_React$Component) {
         value: function getCursorFrameDOM() {
             return _reactDom2.default.findDOMNode(this.refs.cursorFrame);
         }
+
+        // Prerender methods
+
     }, {
         key: 'getCursorFrameElement',
         value: function getCursorFrameElement() {
@@ -419,7 +373,7 @@ var MagicZoom = function (_React$Component) {
             if (this.$image) {
 
                 style.backgroundImage = 'url(' + this.$image.src + ')';
-                style.backgroundSize = reflectionSettings.size.width * this.state.options.reflection.scale + 'px ' + reflectionSettings.size.height * this.state.options.reflection.scale + 'px';
+                style.backgroundSize = reflectionSettings.size.width * this.props.reflection.scale + 'px ' + reflectionSettings.size.height * this.props.reflection.scale + 'px';
                 style.backgroundPosition = reflectionSettings.background.position.x + 'px ' + reflectionSettings.background.position.y + 'px';
             }
 
@@ -463,5 +417,34 @@ exports.default = MagicZoom;
 
 
 MagicZoom.propTypes = {
-    children: _react2.default.PropTypes.node.isRequired
+    children: _react2.default.PropTypes.node.isRequired,
+    type: _react2.default.PropTypes.oneOf(['auto', 'custom', 'invider', 'donor'])
+};
+
+MagicZoom.defaultProps = {
+    // temporary for testing
+
+    type: 'auto',
+
+    cursorFrame: {
+        // can be {heigth: int, width: int} or auto string
+        size: 'auto',
+
+        // ablility of frame moving out of original image
+        overflow: true
+    },
+
+    reflection: {
+
+        // Value:   'auto' - clone of original image
+        //          {heigth: int, width: int} - dimention
+        size: 'auto',
+
+        // Value:   'left', 'right', 'top', 'bottom' - position of
+        //                                              reflection
+        position: 'left',
+
+        // Value: @flaot - scale coefficient
+        scale: 2
+    }
 };
