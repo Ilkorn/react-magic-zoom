@@ -184,7 +184,7 @@ var MagicZoom = function (_React$Component) {
 
                 // ToDo: fix issue
                 // if (userAgent.isDesktopAgent())
-                //     this.initializeReflection();
+                this.initializeReflection();
                 this.setState(state);
             }
         }

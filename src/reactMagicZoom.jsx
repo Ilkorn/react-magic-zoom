@@ -149,7 +149,7 @@ class MagicZoom extends React.Component {
 
             // ToDo: fix issue
             // if (userAgent.isDesktopAgent())
-            //     this.initializeReflection();
+            this.initializeReflection();
             this.setState(state);
         }
     }
@@ -281,11 +281,35 @@ class MagicZoom extends React.Component {
 
     // Utils methods Todo: apply widthOffset fix
     getReflectionImageDOM() {
-        return ReactDom.findDOMNode(this.refs.imageReflection);
+        let existReflection = ReactDom.findDOMNode(this.refs.imageReflection);
+
+        if (!existReflection) {
+            let state = this.state;
+            state.elementsState.reflection.disabled = false;
+            this.setState(state);
+
+            this.initializeReflection();
+            existReflection = this.getImageReflection();
+        }
+
+        return existReflection;
     }
 
     getCursorFrameDOM() {
-        return ReactDom.findDOMNode(this.refs.cursorFrame);
+        let existCursor = ReactDom.findDOMNode(this.refs.cursorFrame);
+
+        if (!existCursor) {
+            let state = this.state;
+
+            // this separate flag
+            state.elementsState.reflection.disabled = false;
+            this.setState(state);
+
+            this.initializeCursorFrame();
+            existCursor = this.getCursorFrameElement();
+        }
+
+        return existCursor;
     }
 
     // Prerender methods
@@ -392,6 +416,9 @@ MagicZoom.defaultProps = {
     type: 'auto',
 
     cursorFrame: {
+
+        type: 'auto',
+
         // can be {heigth: int, width: int} or auto string
         size: 'auto',
 
