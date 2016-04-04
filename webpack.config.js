@@ -29,6 +29,10 @@ var config = {
         cache: false,
       },
     },
+    {
+        test: /\.scss$/,
+        loaders: ["style", "css", "sass"]
+    }
   ],
   },
 };

@@ -1,0 +1,10 @@
+{
+    "preset": "airbnb",
+    "esnext": true,
+    "validateIndentation": 4,
+    "requireMultipleVarDecl": true,
+    "disallowMultipleVarDecl": null,
+    "fileExtensions": [".js", ".jsx"],
+
+   "requireTrailingComma"  : false
+}
