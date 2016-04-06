@@ -139,17 +139,32 @@ class MagicZoom extends React.Component {
         this.setState(state);
     }
 
+    preInitializeElement(element, elementName) {
+
+        let capitalizedName = elementName.charAt(0).toUpperCase() + elementName.slice(1);
+        if (!element) {
+            let state = this.state;
+            state.elementsState.reflection.disabled = false;
+            this.setState(state);
+
+            this['initialize' + capitalizedName]();
+            return this['get' + capitalizedName]();
+        } else {
+            return element;
+        }
+    }
+
     // Handler methids
     handleImageLoad(event) {
         if (event.target.tagName.toLowerCase() === 'img') {
             let state = this.state;
 
             this.$image = event.target;
-            this.initializeCursorFrame();
+            this.preInitializeElement(null, 'cursorFrame');
 
             // ToDo: fix issue
             // if (userAgent.isDesktopAgent())
-            this.initializeReflection();
+            this.preInitializeElement(null, 'reflection');
             this.setState(state);
         }
     }
@@ -283,37 +298,17 @@ class MagicZoom extends React.Component {
     getReflectionImageDOM() {
         let existReflection = ReactDom.findDOMNode(this.refs.imageReflection);
 
-        if (!existReflection) {
-            let state = this.state;
-            state.elementsState.reflection.disabled = false;
-            this.setState(state);
-
-            this.initializeReflection();
-            existReflection = this.getImageReflection();
-        }
-
-        return existReflection;
+        return existReflection || this.preInitializeElement(existReflection, 'reflection');
     }
 
     getCursorFrameDOM() {
         let existCursor = ReactDom.findDOMNode(this.refs.cursorFrame);
 
-        if (!existCursor) {
-            let state = this.state;
-
-            // this separate flag
-            state.elementsState.reflection.disabled = false;
-            this.setState(state);
-
-            this.initializeCursorFrame();
-            existCursor = this.getCursorFrameElement();
-        }
-
-        return existCursor;
+        return existCursor || this.preInitializeElement(existCursor, 'cursorFrame');
     }
 
     // Prerender methods
-    getCursorFrameElement() {
+    getCursorFrame() {
         var cursorFrameSettings = this.state.elementsState.cursorFrame,
             classNames = 'magic-zoom__cursor-frame',
             style = {},
@@ -346,7 +341,7 @@ class MagicZoom extends React.Component {
         return element;
     }
 
-    getImageReflection() {
+    getReflection() {
         var reflectionSettings = this.state.elementsState.reflection,
             style = {
                 height: reflectionSettings.size.height + 'px',
@@ -381,8 +376,8 @@ class MagicZoom extends React.Component {
     }
 
     render() {
-        var cursorFrame = this.getCursorFrameElement(),
-            imageReflection = this.getImageReflection(),
+        var cursorFrame = this.getCursorFrame(),
+            imageReflection = this.getReflection(),
             wrapperStyle = this.state.elementsState.imageWrapper.style;
 
         return (
@@ -439,4 +434,4 @@ MagicZoom.defaultProps = {
         // Value: @flaot - scale coefficient
         scale: 2
     }
-}
+};
