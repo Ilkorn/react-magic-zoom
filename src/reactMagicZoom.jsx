@@ -139,13 +139,15 @@ class MagicZoom extends React.Component {
         this.setState(state);
     }
 
-    preInitializeElement(element, elementName) {
+    preInitializeElement(element, elementName, options) {
 
         let capitalizedName = elementName.charAt(0).toUpperCase() + elementName.slice(1);
         if (!element) {
-            let state = this.state;
-            state.elementsState.reflection.disabled = false;
-            this.setState(state);
+            if (options && options.show) {
+                let state = this.state;
+                state.elementsState.reflection.disabled = false;
+                this.setState(state);
+            }
 
             this['initialize' + capitalizedName]();
             return this['get' + capitalizedName]();
@@ -172,8 +174,8 @@ class MagicZoom extends React.Component {
     handleMouseMoveOnImage(event) {
         var state = this.state,
             nativeEvent = event.nativeEvent,
-            reflectionElement = this.getReflectionImageDOM(),
-            cursorFrame = this.getCursorFrameDOM();
+            reflectionElement = this.getDomElement('reflection'),
+            cursorFrame = this.getDomElement('cursorFrame');
 
         if (event.target === this.$image) {
             this.calculateMouseAndCursorPositionByImage(state, nativeEvent, reflectionElement, cursorFrame);
@@ -295,16 +297,13 @@ class MagicZoom extends React.Component {
     }
 
     // Utils methods Todo: apply widthOffset fix
-    getReflectionImageDOM() {
-        let existReflection = ReactDom.findDOMNode(this.refs.imageReflection);
+    getDomElement(refName) {
+        let existElement = ReactDom.findDOMNode(this.refs[refName]);
 
-        return existReflection || this.preInitializeElement(existReflection, 'reflection');
-    }
-
-    getCursorFrameDOM() {
-        let existCursor = ReactDom.findDOMNode(this.refs.cursorFrame);
-
-        return existCursor || this.preInitializeElement(existCursor, 'cursorFrame');
+        return existElement || this.preInitializeElement(existReflection, refName,
+            {
+                show: true
+            });
     }
 
     // Prerender methods
@@ -368,7 +367,7 @@ class MagicZoom extends React.Component {
             <div
                 style={style}
                 className="magic-zoom__reflection"
-                ref="imageReflection"
+                ref="reflection"
             />
         );
 

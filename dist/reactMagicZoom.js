@@ -172,13 +172,15 @@ var MagicZoom = function (_React$Component) {
         }
     }, {
         key: 'preInitializeElement',
-        value: function preInitializeElement(element, elementName) {
+        value: function preInitializeElement(element, elementName, options) {
 
             var capitalizedName = elementName.charAt(0).toUpperCase() + elementName.slice(1);
             if (!element) {
-                var state = this.state;
-                state.elementsState.reflection.disabled = false;
-                this.setState(state);
+                if (options && options.show) {
+                    var state = this.state;
+                    state.elementsState.reflection.disabled = false;
+                    this.setState(state);
+                }
 
                 this['initialize' + capitalizedName]();
                 return this['get' + capitalizedName]();
@@ -209,8 +211,8 @@ var MagicZoom = function (_React$Component) {
         value: function handleMouseMoveOnImage(event) {
             var state = this.state,
                 nativeEvent = event.nativeEvent,
-                reflectionElement = this.getReflectionImageDOM(),
-                cursorFrame = this.getCursorFrameDOM();
+                reflectionElement = this.getDomElement('reflection'),
+                cursorFrame = this.getDomElement('cursorFrame');
 
             if (event.target === this.$image) {
                 this.calculateMouseAndCursorPositionByImage(state, nativeEvent, reflectionElement, cursorFrame);
@@ -326,18 +328,13 @@ var MagicZoom = function (_React$Component) {
         // Utils methods Todo: apply widthOffset fix
 
     }, {
-        key: 'getReflectionImageDOM',
-        value: function getReflectionImageDOM() {
-            var existReflection = _reactDom2.default.findDOMNode(this.refs.imageReflection);
+        key: 'getDomElement',
+        value: function getDomElement(refName) {
+            var existElement = _reactDom2.default.findDOMNode(this.refs[refName]);
 
-            return existReflection || this.preInitializeElement(existReflection, 'reflection');
-        }
-    }, {
-        key: 'getCursorFrameDOM',
-        value: function getCursorFrameDOM() {
-            var existCursor = _reactDom2.default.findDOMNode(this.refs.cursorFrame);
-
-            return existCursor || this.preInitializeElement(existCursor, 'cursorFrame');
+            return existElement || this.preInitializeElement(existReflection, refName, {
+                show: true
+            });
         }
 
         // Prerender methods
@@ -400,7 +397,7 @@ var MagicZoom = function (_React$Component) {
             element = _react2.default.createElement('div', {
                 style: style,
                 className: 'magic-zoom__reflection',
-                ref: 'imageReflection'
+                ref: 'reflection'
             });
 
             return element;
