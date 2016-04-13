@@ -400,7 +400,7 @@ class MagicZoom extends React.Component {
 export default MagicZoom;
 
 MagicZoom.propTypes = {
-    children: React.PropTypes.node.isRequired,
+    children: React.PropTypes.element.isRequired,
     type: React.PropTypes.oneOf(['auto', 'custom', 'invider', 'donor'])
 };
 

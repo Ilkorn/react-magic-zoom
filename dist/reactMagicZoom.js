@@ -434,7 +434,7 @@ exports.default = MagicZoom;
 
 
 MagicZoom.propTypes = {
-    children: _react2.default.PropTypes.node.isRequired,
+    children: _react2.default.PropTypes.element.isRequired,
     type: _react2.default.PropTypes.oneOf(['auto', 'custom', 'invider', 'donor'])
 };
 
