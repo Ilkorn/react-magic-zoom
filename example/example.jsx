@@ -9,7 +9,7 @@ export class App extends React.Component {
         return (
             <MagicZoom>
                 <span>
-                    <img src={'http://lorempixel.com/800/600/sports/1'} />
+                    <img src={'http://lorempixel.com/520/400/sports/1'} />
                 </span>
             </MagicZoom>);
     }

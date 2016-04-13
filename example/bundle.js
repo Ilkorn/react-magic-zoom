@@ -93,7 +93,7 @@
 	                _react2.default.createElement(
 	                    'span',
 	                    null,
-	                    _react2.default.createElement('img', { src: 'http://lorempixel.com/800/600/sports/1' })
+	                    _react2.default.createElement('img', { src: 'http://lorempixel.com/520/400/sports/1' })
 	                )
 	            );
 	        }
