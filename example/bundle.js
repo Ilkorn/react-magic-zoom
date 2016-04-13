@@ -46,6 +46,11 @@
 
 	'use strict';
 
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.App = undefined;
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _reactMagicZoom = __webpack_require__(1);
@@ -68,7 +73,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var App = function (_React$Component) {
+	__webpack_require__(161);
+
+	var App = exports.App = function (_React$Component) {
 	    _inherits(App, _React$Component);
 
 	    function App() {
@@ -80,14 +87,22 @@
 	    _createClass(App, [{
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement(_reactMagicZoom2.default, null);
+	            return _react2.default.createElement(
+	                _reactMagicZoom2.default,
+	                null,
+	                _react2.default.createElement(
+	                    'span',
+	                    null,
+	                    _react2.default.createElement('img', { src: 'http://lorempixel.com/800/600/sports/1' })
+	                )
+	            );
 	        }
 	    }]);
 
 	    return App;
 	}(_react2.default.Component);
 
-	_reactDom2.default.render(_react2.default.createElement(_reactMagicZoom2.default, null), document.getElementById('app'));
+	_reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('app'));
 
 /***/ },
 /* 1 */
@@ -98,8 +113,6 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -142,32 +155,6 @@
 	        _this.handleMouseEnterOnImage = _this.handleMouseEnterOnImage.bind(_this);
 
 	        _this.state = {
-
-	            // temporary for testing
-	            options: {
-
-	                cursorFrame: {
-	                    // can be {heigth: int, width: int} or auto string
-	                    size: 'auto',
-
-	                    // ablility of frame moving out of original image
-	                    overflow: true
-	                },
-
-	                reflection: {
-
-	                    // Value:   'auto' - clone of original image
-	                    //          {heigth: int, width: int} - dimention
-	                    size: 'auto',
-
-	                    // Value:   'left', 'right', 'top', 'bottom' - position of
-	                    //                                              reflection
-	                    position: 'left',
-
-	                    // Value: @flaot - scale coefficient
-	                    scale: 2
-	                }
-	            },
 
 	            elementsState: {
 	                imageWrapper: {
@@ -225,51 +212,21 @@
 	    }, {
 	        key: 'componentWillUnmount',
 	        value: function componentWillUnmount() {}
+
+	        // Initialization methods
+
 	    }, {
 	        key: 'initializeComponentState',
 	        value: function initializeComponentState() {
+	            // ToDo move changable props to state
+	            // preset default option by component type
 	            var state = this.state;
-
-	            if (this.props.cursorFrame) {
-	                if (typeof this.props.cursorFrame.size === 'string' || _typeof(this.props.cursorFrame.size) === 'object') {
-
-	                    // check params
-	                    state.options.cursorFrame.size = this.props.cursorFrame.size;
-	                }
-
-	                if (typeof this.props.cursorFrame.overflow === 'boolean') {
-
-	                    // check params
-	                    state.options.cursorFrame.overflow = this.props.cursorFrame.overflow;
-	                }
-	            }
-
-	            if (this.props.reflection) {
-	                if (typeof this.props.reflection.size === 'string' || _typeof(this.props.reflection.size) === 'object') {
-
-	                    // check params
-	                    state.options.reflection.size = this.props.reflection.size;
-	                }
-
-	                if (typeof this.props.reflection.scale === 'number') {
-
-	                    // check params
-	                    state.options.reflection.scale = this.props.cursorFrame.scale;
-	                }
-
-	                if (typeof this.props.reflection.position === 'string') {
-
-	                    // check params
-	                    state.options.reflection.position = this.props.cursorFrame.position;
-	                }
-	            }
-
 	            this.setState(state);
 	        }
 	    }, {
 	        key: 'initializeReflection',
 	        value: function initializeReflection() {
-	            if (this.state.options.reflection.size == 'auto' && this.$image) {
+	            if (this.props.reflection.size === 'auto' && this.$image) {
 	                var state = this.state;
 
 	                state.elementsState.reflection.size.height = this.$image.height;
@@ -308,8 +265,8 @@
 	                };
 	            } else if (cursorFrameState.type === 'auto') {
 	                cursorFrameState.size = {
-	                    height: this.$image.height / this.state.options.reflection.scale,
-	                    width: this.$image.width / this.state.options.reflection.scale
+	                    height: this.$image.height / this.props.reflection.scale,
+	                    width: this.$image.width / this.props.reflection.scale
 	                };
 
 	                cursorFrameState.position = {
@@ -324,17 +281,38 @@
 	            this.setState(state);
 	        }
 	    }, {
+	        key: 'preInitializeElement',
+	        value: function preInitializeElement(element, elementName, options) {
+
+	            var capitalizedName = elementName.charAt(0).toUpperCase() + elementName.slice(1);
+	            if (!element) {
+	                if (options && options.show) {
+	                    var state = this.state;
+	                    state.elementsState.reflection.disabled = false;
+	                    this.setState(state);
+	                }
+
+	                this['initialize' + capitalizedName]();
+	                return this['get' + capitalizedName]();
+	            } else {
+	                return element;
+	            }
+	        }
+
+	        // Handler methids
+
+	    }, {
 	        key: 'handleImageLoad',
 	        value: function handleImageLoad(event) {
 	            if (event.target.tagName.toLowerCase() === 'img') {
 	                var state = this.state;
 
 	                this.$image = event.target;
-	                this.initializeCursorFrame();
+	                this.preInitializeElement(null, 'cursorFrame');
 
 	                // ToDo: fix issue
 	                // if (userAgent.isDesktopAgent())
-	                //     this.initializeReflection();
+	                this.preInitializeElement(null, 'reflection');
 	                this.setState(state);
 	            }
 	        }
@@ -343,8 +321,8 @@
 	        value: function handleMouseMoveOnImage(event) {
 	            var state = this.state,
 	                nativeEvent = event.nativeEvent,
-	                reflectionElement = this.getReflectionImageDOM(),
-	                cursorFrame = this.getCursorFrameDOM();
+	                reflectionElement = this.getDomElement('reflection'),
+	                cursorFrame = this.getDomElement('cursorFrame');
 
 	            if (event.target === this.$image) {
 	                this.calculateMouseAndCursorPositionByImage(state, nativeEvent, reflectionElement, cursorFrame);
@@ -355,10 +333,30 @@
 	            this.setState(state);
 	        }
 	    }, {
+	        key: 'handleMouseLeaveFromImage',
+	        value: function handleMouseLeaveFromImage(event) {
+	            var state = this.state;
+	            state.elementsState.reflection.disabled = true;
+	            this.setState(state);
+	        }
+	    }, {
+	        key: 'handleMouseEnterOnImage',
+	        value: function handleMouseEnterOnImage(event) {
+	            var state = this.state;
+	            state.elementsState.reflection.disabled = false;
+
+	            // should update cursor postion
+
+	            this.setState(state);
+	        }
+
+	        // Calculators
+
+	    }, {
 	        key: 'calculateMouseAndCursorPositionByImage',
 	        value: function calculateMouseAndCursorPositionByImage(state, nativeEvent, reflectionElement, cursorFrame) {
-	            state.elementsState.reflection.background.position.x = -(nativeEvent.offsetX * state.options.reflection.scale - reflectionElement.offsetWidth / 2);
-	            state.elementsState.reflection.background.position.y = -(nativeEvent.offsetY * state.options.reflection.scale - reflectionElement.offsetHeight / 2);
+	            state.elementsState.reflection.background.position.x = -(nativeEvent.offsetX * this.props.reflection.scale - reflectionElement.offsetWidth / 2);
+	            state.elementsState.reflection.background.position.y = -(nativeEvent.offsetY * this.props.reflection.scale - reflectionElement.offsetHeight / 2);
 
 	            // frame
 	            if (!state.elementsState.cursorFrame.overflow) {
@@ -402,9 +400,9 @@
 	                    }
 	                }
 
-	                state.elementsState.reflection.background.position.x = -(cursorRelatedPosition.x * state.options.reflection.scale - this.state.elementsState.reflection.size.width / 2);
+	                state.elementsState.reflection.background.position.x = -(cursorRelatedPosition.x * this.props.reflection.scale - this.state.elementsState.reflection.size.width / 2);
 
-	                state.elementsState.reflection.background.position.y = -(cursorRelatedPosition.y * state.options.reflection.scale - this.state.elementsState.reflection.size.height / 2);
+	                state.elementsState.reflection.background.position.y = -(cursorRelatedPosition.y * this.props.reflection.scale - this.state.elementsState.reflection.size.height / 2);
 	            }
 	        }
 	    }, {
@@ -436,36 +434,24 @@
 	                state.elementsState.cursorFrame.position.y = nativeEvent.target.offsetTop + nativeEvent.offsetY;
 	            }
 	        }
-	    }, {
-	        key: 'handleMouseLeaveFromImage',
-	        value: function handleMouseLeaveFromImage(event) {
-	            var state = this.state;
-	            state.elementsState.reflection.disabled = true;
-	            this.setState(state);
-	        }
-	    }, {
-	        key: 'handleMouseEnterOnImage',
-	        value: function handleMouseEnterOnImage(event) {
-	            var state = this.state;
-	            state.elementsState.reflection.disabled = false;
 
-	            // should update cursor postion
+	        // Utils methods Todo: apply widthOffset fix
 
-	            this.setState(state);
-	        }
 	    }, {
-	        key: 'getReflectionImageDOM',
-	        value: function getReflectionImageDOM() {
-	            return _reactDom2.default.findDOMNode(this.refs.imageReflection);
+	        key: 'getDomElement',
+	        value: function getDomElement(refName) {
+	            var existElement = _reactDom2.default.findDOMNode(this.refs[refName]);
+
+	            return existElement || this.preInitializeElement(existReflection, refName, {
+	                show: true
+	            });
 	        }
+
+	        // Prerender methods
+
 	    }, {
-	        key: 'getCursorFrameDOM',
-	        value: function getCursorFrameDOM() {
-	            return _reactDom2.default.findDOMNode(this.refs.cursorFrame);
-	        }
-	    }, {
-	        key: 'getCursorFrameElement',
-	        value: function getCursorFrameElement() {
+	        key: 'getCursorFrame',
+	        value: function getCursorFrame() {
 	            var cursorFrameSettings = this.state.elementsState.cursorFrame,
 	                classNames = 'magic-zoom__cursor-frame',
 	                style = {},
@@ -496,8 +482,8 @@
 	            return element;
 	        }
 	    }, {
-	        key: 'getImageReflection',
-	        value: function getImageReflection() {
+	        key: 'getReflection',
+	        value: function getReflection() {
 	            var reflectionSettings = this.state.elementsState.reflection,
 	                style = {
 	                height: reflectionSettings.size.height + 'px',
@@ -514,14 +500,14 @@
 	            if (this.$image) {
 
 	                style.backgroundImage = 'url(' + this.$image.src + ')';
-	                style.backgroundSize = reflectionSettings.size.width * this.state.options.reflection.scale + 'px ' + reflectionSettings.size.height * this.state.options.reflection.scale + 'px';
+	                style.backgroundSize = reflectionSettings.size.width * this.props.reflection.scale + 'px ' + reflectionSettings.size.height * this.props.reflection.scale + 'px';
 	                style.backgroundPosition = reflectionSettings.background.position.x + 'px ' + reflectionSettings.background.position.y + 'px';
 	            }
 
 	            element = _react2.default.createElement('div', {
 	                style: style,
 	                className: 'magic-zoom__reflection',
-	                ref: 'imageReflection'
+	                ref: 'reflection'
 	            });
 
 	            return element;
@@ -529,8 +515,8 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var cursorFrame = this.getCursorFrameElement(),
-	                imageReflection = this.getImageReflection(),
+	            var cursorFrame = this.getCursorFrame(),
+	                imageReflection = this.getReflection(),
 	                wrapperStyle = this.state.elementsState.imageWrapper.style;
 
 	            return _react2.default.createElement(
@@ -558,7 +544,39 @@
 
 
 	MagicZoom.propTypes = {
-	    children: _react2.default.PropTypes.node.isRequired
+	    children: _react2.default.PropTypes.element.isRequired,
+	    type: _react2.default.PropTypes.oneOf(['auto', 'custom', 'invider', 'donor'])
+	};
+
+	MagicZoom.defaultProps = {
+	    // temporary for testing
+
+	    type: 'auto',
+
+	    cursorFrame: {
+
+	        type: 'auto',
+
+	        // can be {heigth: int, width: int} or auto string
+	        size: 'auto',
+
+	        // ablility of frame moving out of original image
+	        overflow: true
+	    },
+
+	    reflection: {
+
+	        // Value:   'auto' - clone of original image
+	        //          {heigth: int, width: int} - dimention
+	        size: 'auto',
+
+	        // Value:   'left', 'right', 'top', 'bottom' - position of
+	        //                                              reflection
+	        position: 'left',
+
+	        // Value: @flaot - scale coefficient
+	        scale: 2
+	    }
 	};
 
 /***/ },
@@ -20218,6 +20236,354 @@
 			window.classNames = classNames;
 		}
 	}());
+
+
+/***/ },
+/* 161 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(162);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(164)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./_react-magic-zoom.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./_react-magic-zoom.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(163)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".magic-zoom__reflection, .magic-zoom__cursor-frame {\n  display: none; }\n\n@media screen and (min-width: 768px) {\n  .magic-zoom__wrapper, .magic-zoom__reflection, .magic-zoom__cursor-frame {\n    display: block;\n    position: absolute;\n    transform: translateZ(0); }\n  .magic-zoom__wrapper {\n    position: relative;\n    z-index: 10;\n    cursor: crosshair; }\n  .magic-zoom__reflection {\n    background-repeat: no-repeat;\n    background-color: white;\n    cursor: crosshair; }\n  .magic-zoom__cursor-frame.magic-zoom__cursor-frame--default {\n    height: 160px;\n    width: 160px;\n    background-color: rgba(0, 0, 0, 0.2); }\n  .magic-zoom__cursor-frame.magic-zoom__cursor-frame--auto {\n    background-color: rgba(0, 0, 0, 0.2); } }\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 163 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 164 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0,
+		styleElementsInsertedAtTop = [];
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+		// By default, add <style> tags to the bottom of <head>.
+		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function insertStyleElement(options, styleElement) {
+		var head = getHeadElement();
+		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+		if (options.insertAt === "top") {
+			if(!lastStyleElementInsertedAtTop) {
+				head.insertBefore(styleElement, head.firstChild);
+			} else if(lastStyleElementInsertedAtTop.nextSibling) {
+				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+			} else {
+				head.appendChild(styleElement);
+			}
+			styleElementsInsertedAtTop.push(styleElement);
+		} else if (options.insertAt === "bottom") {
+			head.appendChild(styleElement);
+		} else {
+			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		}
+	}
+
+	function removeStyleElement(styleElement) {
+		styleElement.parentNode.removeChild(styleElement);
+		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+		if(idx >= 0) {
+			styleElementsInsertedAtTop.splice(idx, 1);
+		}
+	}
+
+	function createStyleElement(options) {
+		var styleElement = document.createElement("style");
+		styleElement.type = "text/css";
+		insertStyleElement(options, styleElement);
+		return styleElement;
+	}
+
+	function createLinkElement(options) {
+		var linkElement = document.createElement("link");
+		linkElement.rel = "stylesheet";
+		insertStyleElement(options, linkElement);
+		return linkElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement(options));
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement(options);
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement(options);
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	var replaceText = (function () {
+		var textStore = [];
+
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+
+		var blob = new Blob([css], { type: "text/css" });
+
+		var oldSrc = linkElement.href;
+
+		linkElement.href = URL.createObjectURL(blob);
+
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
 
 
 /***/ }

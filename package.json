@@ -4,10 +4,10 @@
   "description": "React component for show zoom in image on mouse hover.",
   "main": "./dist/reactMagicZoom.js",
   "scripts": {
-    "build": "npm run build-js && npm run build-css",
+    "build": "npm run build-js && webpack && npm run build-css",
     "build-js": "babel src --out-dir dist",
     "build-css": "node-sass ./src/scss/_react-magic-zoom.scss ./dist/css/react-magic-zoom.css",
-    "example": "webpack-dev-server --progress --colors --no-info --content-base example",
+    "example": "webpack && webpack-dev-server --progress --colors --no-info --content-base example",
     "test": "test",
     "prepublish": "npm run build"
   },
