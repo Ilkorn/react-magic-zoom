@@ -2,7 +2,7 @@ This component don’t have a third part dependency.
 
 **Here you can see [DEMO] (http://ilkorn.github.io/react-magic-zoom/) **:
 
-###Usage:
+####Usage:
 
 For use this component you should put inside it node with `<img>` tab with fill `src`:
 
@@ -27,6 +27,6 @@ export class App extends React.Component {
 
 ReactDOM.render(<App/>, document.getElementById('app'));
 ```
-###Option:
+####Option:
 
 **TBD**
