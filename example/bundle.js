@@ -145,14 +145,15 @@
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(MagicZoom).call(this, props));
 
 	        _this.$image = undefined;
-	        _this.$imageFrame = undefined;
-	        _this.$imageReflection = undefined;
+	        _this.$cursorFrame = undefined;
+	        _this.$reflection = undefined;
 	        _this.$imageWrapper = undefined;
 
 	        _this.handleImageLoad = _this.handleImageLoad.bind(_this);
 	        _this.handleMouseMoveOnImage = _this.handleMouseMoveOnImage.bind(_this);
 	        _this.handleMouseLeaveFromImage = _this.handleMouseLeaveFromImage.bind(_this);
 	        _this.handleMouseEnterOnImage = _this.handleMouseEnterOnImage.bind(_this);
+	        _this.handleTouchMoveOnImage = _this.handleTouchMoveOnImage.bind(_this);
 
 	        _this.state = {
 
@@ -308,26 +309,67 @@
 	                var state = this.state;
 
 	                this.$image = event.target;
-	                this.preInitializeElement(null, 'cursorFrame');
+	                this.$cursorFrame = this.preInitializeElement(null, 'cursorFrame');
 
 	                // ToDo: fix issue
 	                // if (userAgent.isDesktopAgent())
-	                this.preInitializeElement(null, 'reflection');
+	                this.$reflection = this.preInitializeElement(null, 'reflection');
 	                this.setState(state);
 	            }
 	        }
 	    }, {
 	        key: 'handleMouseMoveOnImage',
 	        value: function handleMouseMoveOnImage(event) {
+	            console.log('move');
+	            var state = this.state,
+	                nativeEvent = event.nativeEvent,
+	                reflectionElement = this.getDomElement('reflection'),
+	                cursorFrame = this.getDomElement('cursorFrame'),
+	                eventPoint = {};
+
+	            if (event.type === 'mousemove') {
+	                if (event.target === this.$image) {
+	                    eventPoint = {
+	                        x: nativeEvent.offsetX,
+	                        y: nativeEvent.offsetY
+	                    };
+	                } else {
+	                    eventPoint = {
+	                        x: nativeEvent.target.offsetLeft + nativeEvent.offsetX,
+	                        y: nativeEvent.target.offsetTop + nativeEvent.offsetY
+	                    };
+	                }
+	            } else if (event.type === 'touchmove') {
+	                eventPoint = {
+	                    x: nativeEvent.touches[0].clientX - this.refs.zoomWrapper.offsetLeft,
+	                    y: nativeEvent.touches[0].clientY - this.refs.zoomWrapper.offsetTop
+	                };
+	            }
+
+	            if (event.target === this.$image) {
+	                this.calculateMouseAndCursorPositionByImage(state, eventPoint, reflectionElement, cursorFrame);
+	            } else if (cursorFrame === event.target) {
+	                this.calculateMouseAndCursorPositionByCursorFrame(state, eventPoint, cursorFrame);
+	            }
+
+	            this.setState(state);
+	        }
+	    }, {
+	        key: 'handleTouchMoveOnImage',
+	        value: function handleTouchMoveOnImage(event) {
+	            // console.log('touch move');
 	            var state = this.state,
 	                nativeEvent = event.nativeEvent,
 	                reflectionElement = this.getDomElement('reflection'),
 	                cursorFrame = this.getDomElement('cursorFrame');
 
+	            this.$reflectionElement = reflectionElement;
+	            this.$cursorFrame = cursorFrame;
+
 	            if (event.target === this.$image) {
-	                this.calculateMouseAndCursorPositionByImage(state, nativeEvent, reflectionElement, cursorFrame);
+	                this.calculateTouchAndCursorPositionByImage(state, nativeEvent, reflectionElement, cursorFrame);
 	            } else if (cursorFrame === event.target) {
-	                this.calculateMouseAndCursorPositionByCursorFrame(state, nativeEvent, cursorFrame);
+	                this.calculateTouchAndCursorPositionByCursorFrame(state, nativeEvent, cursorFrame);
 	            }
 
 	            this.setState(state);
@@ -335,6 +377,7 @@
 	    }, {
 	        key: 'handleMouseLeaveFromImage',
 	        value: function handleMouseLeaveFromImage(event) {
+	            console.log('leave');
 	            var state = this.state;
 	            state.elementsState.reflection.disabled = true;
 	            this.setState(state);
@@ -342,6 +385,7 @@
 	    }, {
 	        key: 'handleMouseEnterOnImage',
 	        value: function handleMouseEnterOnImage(event) {
+	            console.log('enter');
 	            var state = this.state;
 	            state.elementsState.reflection.disabled = false;
 
@@ -354,16 +398,31 @@
 
 	    }, {
 	        key: 'calculateMouseAndCursorPositionByImage',
-	        value: function calculateMouseAndCursorPositionByImage(state, nativeEvent, reflectionElement, cursorFrame) {
+	        value: function calculateMouseAndCursorPositionByImage(state, eventPoint, reflectionElement, cursorFrame) {
+	            state.elementsState.reflection.background.position.x = -(eventPoint.x * this.props.reflection.scale - reflectionElement.offsetWidth / 2);
+	            state.elementsState.reflection.background.position.y = -(eventPoint.y * this.props.reflection.scale - reflectionElement.offsetHeight / 2);
+
+	            // frame
+	            if (!state.elementsState.cursorFrame.overflow) {
+	                this.calculateCursorPositionByClosestBorder(state, eventPoint, {
+	                    width: this.$image ? this.$image.width : 0,
+	                    height: this.$image ? this.$image.height : 0
+	                });
+	            } else if (cursorFrame) {
+	                state.elementsState.cursorFrame.position.y = eventPoint.y;
+	                state.elementsState.cursorFrame.position.x = eventPoint.x;
+	            }
+	        }
+	    }, {
+	        key: 'calculateTouchAndCursorPositionByImage',
+	        value: function calculateTouchAndCursorPositionByImage(state, eventPoint, reflectionElement, cursorFrame) {
+	            console.log(nativeEvent.touches[0].clientX - this.refs.zoomWrapper.offsetLeft, ' X ', nativeEvent.touches[0].clientY - this.refs.zoomWrapper.offsetTop);
 	            state.elementsState.reflection.background.position.x = -(nativeEvent.offsetX * this.props.reflection.scale - reflectionElement.offsetWidth / 2);
 	            state.elementsState.reflection.background.position.y = -(nativeEvent.offsetY * this.props.reflection.scale - reflectionElement.offsetHeight / 2);
 
 	            // frame
 	            if (!state.elementsState.cursorFrame.overflow) {
-	                this.calculateCursorPositionByClosestBorder(state, nativeEvent, {
-	                    x: nativeEvent.offsetX,
-	                    y: nativeEvent.offsetY
-	                }, {
+	                this.calculateCursorPositionByClosestBorder(state, eventPoint, {
 	                    width: this.$image ? this.$image.width : 0,
 	                    height: this.$image ? this.$image.height : 0
 	                });
@@ -374,7 +433,37 @@
 	        }
 	    }, {
 	        key: 'calculateMouseAndCursorPositionByCursorFrame',
-	        value: function calculateMouseAndCursorPositionByCursorFrame(state, nativeEvent, cursorFrame) {
+	        value: function calculateMouseAndCursorPositionByCursorFrame(state, eventPoint, cursorFrame) {
+	            var imageSize = {};
+
+	            imageSize = {
+	                width: this.$image ? this.$image.width : 0,
+	                height: this.$image ? this.$image.height : 0
+	            };
+
+	            // hide if mouse blur
+	            if (eventPoint.x > imageSize.width || eventPoint.x < 0 || eventPoint.y > imageSize.height || eventPoint.y < 0) {
+	                state.elementsState.reflection.disabled = true;
+	            } else {
+
+	                if (!state.elementsState.cursorFrame.overflow) {
+	                    this.calculateCursorPositionByClosestBorder(state, eventPoint, imageSize);
+	                } else {
+	                    if (cursorFrame) {
+	                        state.elementsState.cursorFrame.position.x = eventPoint.x;
+	                        state.elementsState.cursorFrame.position.y = eventPoint.y;
+	                    }
+	                }
+
+	                state.elementsState.reflection.background.position.x = -(eventPoint.x * this.props.reflection.scale - this.state.elementsState.reflection.size.width / 2);
+
+	                state.elementsState.reflection.background.position.y = -(eventPoint.y * this.props.reflection.scale - this.state.elementsState.reflection.size.height / 2);
+	            }
+	        }
+	    }, {
+	        key: 'calculateTouchAndCursorPositionByCursorFrame',
+	        value: function calculateTouchAndCursorPositionByCursorFrame(state, nativeEvent, cursorFrame) {
+	            console.log(nativeEvent.touches[0].clientX - this.refs.zoomWrapper.offsetLeft, ' X ', nativeEvent.touches[0].clientY - this.refs.zoomWrapper.offsetTop);
 	            var cursorRelatedPosition = {},
 	                imageSize = {};
 
@@ -392,7 +481,7 @@
 	            } else {
 
 	                if (!state.elementsState.cursorFrame.overflow) {
-	                    this.calculateCursorPositionByClosestBorder(state, nativeEvent, cursorRelatedPosition, imageSize);
+	                    this.calculateCursorPositionByClosestBorder(state, cursorRelatedPosition, imageSize);
 	                } else {
 	                    if (cursorFrame) {
 	                        state.elementsState.cursorFrame.position.x = nativeEvent.target.offsetLeft + nativeEvent.offsetX;
@@ -407,39 +496,36 @@
 	        }
 	    }, {
 	        key: 'calculateCursorPositionByClosestBorder',
-	        value: function calculateCursorPositionByClosestBorder(state, nativeEvent, cursorRelatedPosition, imageSize) {
-	            if (cursorRelatedPosition.x + state.elementsState.cursorFrame.size.width / 2 >= imageSize.width || cursorRelatedPosition.x - state.elementsState.cursorFrame.size.width / 2 <= 0) {
+	        value: function calculateCursorPositionByClosestBorder(state, eventPoint, imageSize) {
+	            if (eventPoint.x + state.elementsState.cursorFrame.size.width / 2 >= imageSize.width || eventPoint.x - state.elementsState.cursorFrame.size.width / 2 <= 0) {
 
-	                if (cursorRelatedPosition.x + state.elementsState.cursorFrame.size.width / 2 >= imageSize.width) {
+	                if (eventPoint.x + state.elementsState.cursorFrame.size.width / 2 >= imageSize.width) {
 	                    state.elementsState.cursorFrame.position.x = imageSize.width - state.elementsState.cursorFrame.size.width / 2;
 	                }
 
-	                if (cursorRelatedPosition.x - state.elementsState.cursorFrame.size.width / 2 <= 0) {
+	                if (eventPoint.x - state.elementsState.cursorFrame.size.width / 2 <= 0) {
 	                    state.elementsState.cursorFrame.position.x = state.elementsState.cursorFrame.size.width / 2;
 	                }
 	            } else {
-	                state.elementsState.cursorFrame.position.x = nativeEvent.target.offsetLeft + nativeEvent.offsetX;
+	                state.elementsState.cursorFrame.position.x = eventPoint.x;
 	            }
 
-	            if (!state.elementsState.cursorFrame.overflow && cursorRelatedPosition.y + state.elementsState.cursorFrame.size.height / 2 >= imageSize.height || cursorRelatedPosition.y - state.elementsState.cursorFrame.size.height / 2 <= 0) {
+	            if (!state.elementsState.cursorFrame.overflow && eventPoint.y + state.elementsState.cursorFrame.size.height / 2 >= imageSize.height || eventPoint.y - state.elementsState.cursorFrame.size.height / 2 <= 0) {
 
-	                if (cursorRelatedPosition.y + state.elementsState.cursorFrame.size.height / 2 >= imageSize.height) {
+	                if (eventPoint.y + state.elementsState.cursorFrame.size.height / 2 >= imageSize.height) {
 	                    state.elementsState.cursorFrame.position.y = imageSize.height - state.elementsState.cursorFrame.size.height / 2;
 	                }
 
-	                if (cursorRelatedPosition.y - state.elementsState.cursorFrame.size.height / 2 <= 0) {
+	                if (eventPoint.y - state.elementsState.cursorFrame.size.height / 2 <= 0) {
 	                    state.elementsState.cursorFrame.position.y = state.elementsState.cursorFrame.size.height / 2;
 	                }
 	            } else {
-	                state.elementsState.cursorFrame.position.y = nativeEvent.target.offsetTop + nativeEvent.offsetY;
+	                state.elementsState.cursorFrame.position.y = eventPoint.y;
 	            }
 	        }
-
-	        // Utils methods Todo: apply widthOffset fix
-
 	    }, {
 	        key: 'getDomElement',
-	        value: function getDomElement(refName) {
+	        value: function getDomElement(refName, existReflection) {
 	            var existElement = _reactDom2.default.findDOMNode(this.refs[refName]);
 
 	            return existElement || this.preInitializeElement(existReflection, refName, {
@@ -528,6 +614,11 @@
 	                    onMouseMove: this.handleMouseMoveOnImage,
 	                    onMouseEnter: this.handleMouseEnterOnImage,
 	                    onMouseLeave: this.handleMouseLeaveFromImage,
+
+	                    onTouchMove: this.handleTouchMoveOnImage,
+	                    onTouchStart: this.handleMouseEnterOnImage,
+	                    onTouchEnd: this.handleMouseLeaveFromImage,
+	                    onTouchCancel: this.handleMouseLeaveFromImage,
 	                    style: wrapperStyle
 	                },
 	                this.props.children,
