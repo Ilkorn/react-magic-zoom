@@ -230,6 +230,7 @@ var MagicZoom = function (_React$Component) {
                     x: nativeEvent.touches[0].clientX - this.refs.zoomWrapper.offsetLeft,
                     y: nativeEvent.touches[0].clientY - this.refs.zoomWrapper.offsetTop
                 };
+                event.preventDefault();
             }
 
             if (event.target === this.$image) {

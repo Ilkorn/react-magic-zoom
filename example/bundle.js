@@ -340,6 +340,7 @@
 	                    x: nativeEvent.touches[0].clientX - this.refs.zoomWrapper.offsetLeft,
 	                    y: nativeEvent.touches[0].clientY - this.refs.zoomWrapper.offsetTop
 	                };
+	                event.preventDefault();
 	            }
 
 	            if (event.target === this.$image) {
@@ -20285,7 +20286,7 @@
 
 
 	// module
-	exports.push([module.id, ".magic-zoom__reflection, .magic-zoom__cursor-frame {\n  display: none; }\n\n@media screen and (min-width: 768px) {\n  .magic-zoom__wrapper, .magic-zoom__reflection, .magic-zoom__cursor-frame {\n    display: block;\n    position: absolute;\n    transform: translateZ(0); }\n  .magic-zoom__wrapper {\n    position: relative;\n    z-index: 10;\n    cursor: crosshair; }\n  .magic-zoom__reflection {\n    background-repeat: no-repeat;\n    background-color: white;\n    cursor: crosshair; }\n  .magic-zoom__cursor-frame.magic-zoom__cursor-frame--default {\n    height: 160px;\n    width: 160px;\n    background-color: rgba(0, 0, 0, 0.2); }\n  .magic-zoom__cursor-frame.magic-zoom__cursor-frame--auto {\n    background-color: rgba(0, 0, 0, 0.2); } }\n", ""]);
+	exports.push([module.id, ".magic-zoom__wrapper, .magic-zoom__reflection, .magic-zoom__cursor-frame {\n  display: block;\n  position: absolute;\n  transform: translateZ(0); }\n\n.magic-zoom__wrapper {\n  position: relative;\n  z-index: 10;\n  cursor: crosshair; }\n\n.magic-zoom__reflection {\n  background-repeat: no-repeat;\n  background-color: white;\n  cursor: crosshair; }\n\n.magic-zoom__cursor-frame.magic-zoom__cursor-frame--default {\n  height: 160px;\n  width: 160px;\n  background-color: rgba(0, 0, 0, 0.2); }\n\n.magic-zoom__cursor-frame.magic-zoom__cursor-frame--auto {\n  background-color: rgba(0, 0, 0, 0.2); }\n", ""]);
 
 	// exports
 
