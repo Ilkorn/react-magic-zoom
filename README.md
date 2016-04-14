@@ -1,6 +1,7 @@
 This component don’t have a third part dependency.
+Work correct for touch devices.
 
-**Here you can see [DEMO] (http://ilkorn.github.io/react-magic-zoom/) **:
+**Here you can see [DEMO](http://ilkorn.github.io/react-magic-zoom/)**
 
 ####Usage:
 
