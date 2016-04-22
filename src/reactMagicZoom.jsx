@@ -109,7 +109,7 @@ class MagicZoom extends React.Component {
             }
         }
 
-        if (cursorFrameState.type === 'default') {
+        if (cursorFrameState.type === 'default' || !this.$image) {
             cursorFrameState.position = {
                 x: 0,
                 y: 0,
