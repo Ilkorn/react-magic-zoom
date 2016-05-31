@@ -31,12 +31,14 @@ ReactDOM.render(<App/>, document.getElementById('app'));
 ####Option:
 
 ```
+// Type 'auto' - autosize cursor and reflection,
+// 'donor' - not render
+type: 'auto',
+
+// Method for add subscriber
+subscribeOnReflection= function(reflection){}
+
 reflection: {
-
-    // Type 'auto' - autosize cursor and reflection,
-    // 'donor' - not render
-    type: 'auto',
-
     // Value:   'left', 'right', 'top', 'bottom' - position of
     //                                              reflection
     //          Object {left: '10px', top: '10%'}
