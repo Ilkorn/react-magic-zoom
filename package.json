@@ -30,6 +30,7 @@
   "homepage": "https://github.com/Ilkorn/react-magic-zoom#readme",
   "dependencies": {
     "classnames": "^2.2.3",
+    "lodash": "^4.13.1",
     "react": "^0.14.8",
     "react-dom": "^0.14.8"
   },

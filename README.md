@@ -30,4 +30,20 @@ ReactDOM.render(<App/>, document.getElementById('app'));
 ```
 ####Option:
 
-**TBD**
+```
+reflection: {
+
+    // Type 'auto' - autosize cursor and reflection,
+    // 'donor' - not render
+    type: 'auto',
+
+    // Value:   'left', 'right', 'top', 'bottom' - position of
+    //                                              reflection
+    //          Object {left: '10px', top: '10%'}
+    //
+    position: 'left',
+
+    // Value: @flaot - scale coefficient
+    scale: 2
+}
+```

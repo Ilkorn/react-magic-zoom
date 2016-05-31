@@ -3,6 +3,7 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 class MagicZoom extends React.Component {
     constructor(props) {
@@ -17,6 +18,8 @@ class MagicZoom extends React.Component {
         this.handleMouseMoveOnImage = this.handleMouseMoveOnImage.bind(this);
         this.handleMouseLeaveFromImage = this.handleMouseLeaveFromImage.bind(this);
         this.handleMouseEnterOnImage = this.handleMouseEnterOnImage.bind(this);
+
+        this.delayedReflectionHandler = _.debounce(this.reflectionSubscribersCall, 10);
 
         this.state = {
 
@@ -85,23 +88,45 @@ class MagicZoom extends React.Component {
     }
 
     initializeReflection() {
-        if (this.props.reflection.size === 'auto' && this.$image) {
-            let state = this.state;
+        let state = this.state;
 
+        state.elementsState.reflection.scale = this.props.reflection.scale || 2;
+        if (this.props.reflection.type && this.props.reflection.type !== 'auto') {
+            state.elementsState.reflection.type = this.props.reflection.type;
+        }
+
+        // auto calculation
+        if (!this.props.reflection.size && this.$image) {
             state.elementsState.reflection.size.height = this.$image.height;
             state.elementsState.reflection.size.width = this.$image.width;
             state.elementsState.imageWrapper.style = {
                 heigth: this.$image.height,
                 width: this.$image.width
             };
-            this.setState(state);
+        } else {
+            // this.props.reflection.size exact value
         }
+        if (this.props.reflection.position === 'right'  ||
+             this.props.reflection.position === 'left'  ||
+             this.props.reflection.position === 'top'   ||
+             this.props.reflection.position === 'bottom') {
+
+            state.elementsState.reflection.position['left'] = '0';
+            state.elementsState.reflection.position['top'] = '0';
+
+            state.elementsState.reflection.position[this.props.reflection.position] = '110%';
+        } else {
+            state.elementsState.reflection.position = this.props.reflection.position;
+        }
+
+        this.setState(state);
     }
 
     initializeCursorFrame() {
         var state = this.state,
             cursorFrameProps = this.props.cursorFrame,
-            cursorFrameState = state.elementsState.cursorFrame;
+            cursorFrameState = state.elementsState.cursorFrame,
+            scale = this.props.reflection.scale || 2;
 
         if (cursorFrameProps) {
             if (cursorFrameProps.type) {
@@ -123,8 +148,8 @@ class MagicZoom extends React.Component {
             };
         } else if (cursorFrameState.type === 'auto') {
             cursorFrameState.size = {
-                height: this.$image.height / this.props.reflection.scale,
-                width: this.$image.width / this.props.reflection.scale
+                height: this.$image.height / scale,
+                width: this.$image.width / scale
             };
 
             cursorFrameState.position = {
@@ -219,11 +244,15 @@ class MagicZoom extends React.Component {
         this.setState(state);
     }
 
+    reflectionSubscribersCall(element) {
+        this.props.subscribeOnReflection && this.props.subscribeOnReflection(element);
+    }
+
     // Calculators
     calculateMouseAndCursorPositionByImage(state, eventPoint, reflectionElement, cursorFrame) {
-        state.elementsState.reflection.background.position.x = -(eventPoint.x * this.props.reflection.scale -
+        state.elementsState.reflection.background.position.x = -(eventPoint.x * this.state.elementsState.reflection.scale -
                                                                 (reflectionElement.offsetWidth / 2));
-        state.elementsState.reflection.background.position.y = -(eventPoint.y * this.props.reflection.scale -
+        state.elementsState.reflection.background.position.y = -(eventPoint.y * this.state.elementsState.reflection.scale -
                                                                 (reflectionElement.offsetHeight / 2));
 
         // frame
@@ -267,10 +296,10 @@ class MagicZoom extends React.Component {
             }
 
             state.elementsState.reflection.background.position.x = -((eventPoint.x) *
-                this.props.reflection.scale - (this.state.elementsState.reflection.size.width / 2));
+                this.state.elementsState.reflection.scale - (this.state.elementsState.reflection.size.width / 2));
 
             state.elementsState.reflection.background.position.y = -((eventPoint.y) *
-                this.props.reflection.scale - (this.state.elementsState.reflection.size.height / 2));
+                this.state.elementsState.reflection.scale - (this.state.elementsState.reflection.size.height / 2));
         }
     }
 
@@ -350,14 +379,16 @@ class MagicZoom extends React.Component {
     }
 
     getReflection() {
-        var reflectionSettings = this.state.elementsState.reflection,
+        var state = this.state,
+            reflectionSettings = this.state.elementsState.reflection,
             style = {
                 height: reflectionSettings.size.height + 'px',
                 width: reflectionSettings.size.width + 'px',
-                left: '110%',
-                top: 0
             },
-            element;
+            element,
+            currentTime = (new Date()).getTime();
+
+        style = _.assign(style, reflectionSettings.position);
 
         if (reflectionSettings.disabled) {
             return null;
@@ -366,20 +397,23 @@ class MagicZoom extends React.Component {
         if (this.$image) {
 
             style.backgroundImage = 'url(' + this.$image.src + ')';
-            style.backgroundSize = (reflectionSettings.size.width * this.props.reflection.scale) + 'px ' +
-                                   (reflectionSettings.size.height * this.props.reflection.scale) + 'px';
+            style.backgroundSize = (reflectionSettings.size.width * reflectionSettings.scale) + 'px ' +
+                                   (reflectionSettings.size.height * reflectionSettings.scale) + 'px';
             style.backgroundPosition = reflectionSettings.background.position.x + 'px ' +
                                        reflectionSettings.background.position.y + 'px';
         }
 
         element = (
             <div
+                ref="reflection"
                 style={style}
                 className="magic-zoom__reflection"
-                ref="reflection"
             />
         );
 
+        if (this.props.subscribeOnReflection) {
+            this.delayedReflectionHandler(element);
+        }
         return element;
     }
 
@@ -388,10 +422,14 @@ class MagicZoom extends React.Component {
             imageReflection = this.getReflection(),
             wrapperStyle = this.state.elementsState.imageWrapper.style;
 
+        if (this.props.type === 'donor') {
+            imageReflection = null;
+        }
+
         return (
             <div
                 ref='zoomWrapper'
-                className={'magic-zoom__wrapper'}
+                className={classNames('magic-zoom__wrapper', this.props.className)}
                 onLoad={this.handleImageLoad}
                 onMouseMove={this.handleMouseMoveOnImage}
                 onMouseEnter={this.handleMouseEnterOnImage}
@@ -420,7 +458,6 @@ MagicZoom.propTypes = {
 
 MagicZoom.defaultProps = {
     // temporary for testing
-
     type: 'auto',
 
     cursorFrame: {
@@ -436,9 +473,7 @@ MagicZoom.defaultProps = {
 
     reflection: {
 
-        // Value:   'auto' - clone of original image
-        //          {heigth: int, width: int} - dimention
-        size: 'auto',
+        type: 'auto',
 
         // Value:   'left', 'right', 'top', 'bottom' - position of
         //                                              reflection
