@@ -46,6 +46,12 @@ reflection: {
     position: 'left',
 
     // Value: @flaot - scale coefficient
-    scale: 2
+    scale: 2,
+
+    // reflection size in pixel, as default will be setter size of pictures
+    size: {
+        height: 100,
+        width: 300
+    }
 }
 ```
