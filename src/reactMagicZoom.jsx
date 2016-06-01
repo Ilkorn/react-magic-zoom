@@ -95,16 +95,20 @@ class MagicZoom extends React.Component {
             state.elementsState.reflection.type = this.props.reflection.type;
         }
 
-        // auto calculation
-        if (!this.props.reflection.size && this.$image) {
-            state.elementsState.reflection.size.height = this.$image.height;
-            state.elementsState.reflection.size.width = this.$image.width;
+        if (this.$image) {
             state.elementsState.imageWrapper.style = {
                 heigth: this.$image.height,
                 width: this.$image.width
             };
+        }
+
+        // auto calculation
+        if (!this.props.reflection.size && this.$image) {
+            state.elementsState.reflection.size.height = this.$image.height;
+            state.elementsState.reflection.size.width = this.$image.width;
         } else {
-            // this.props.reflection.size exact value
+            state.elementsState.reflection.size.height = this.props.reflection.size.height;
+            state.elementsState.reflection.size.width = this.props.reflection.size.width;
         }
         if (this.props.reflection.position === 'right'  ||
              this.props.reflection.position === 'left'  ||
@@ -148,8 +152,8 @@ class MagicZoom extends React.Component {
             };
         } else if (cursorFrameState.type === 'auto') {
             cursorFrameState.size = {
-                height: this.$image.height / scale,
-                width: this.$image.width / scale
+                height: state.elementsState.reflection.size.height / scale,
+                width: state.elementsState.reflection.size.width / scale
             };
 
             cursorFrameState.position = {
@@ -187,9 +191,8 @@ class MagicZoom extends React.Component {
             let state = this.state;
 
             this.$image = event.target;
-            this.$cursorFrame = this.preInitializeElement(null, 'cursorFrame');
-
             this.$reflection = this.preInitializeElement(null, 'reflection');
+            this.$cursorFrame = this.preInitializeElement(null, 'cursorFrame');
             this.setState(state);
         }
     }
@@ -385,8 +388,7 @@ class MagicZoom extends React.Component {
                 height: reflectionSettings.size.height + 'px',
                 width: reflectionSettings.size.width + 'px',
             },
-            element,
-            currentTime = (new Date()).getTime();
+            element;
 
         style = _.assign(style, reflectionSettings.position);
 
@@ -397,8 +399,8 @@ class MagicZoom extends React.Component {
         if (this.$image) {
 
             style.backgroundImage = 'url(' + this.$image.src + ')';
-            style.backgroundSize = (reflectionSettings.size.width * reflectionSettings.scale) + 'px ' +
-                                   (reflectionSettings.size.height * reflectionSettings.scale) + 'px';
+            style.backgroundSize = (state.elementsState.imageWrapper.style.width * reflectionSettings.scale) + 'px ' +
+                                   (state.elementsState.imageWrapper.style.heigth * reflectionSettings.scale) + 'px';
             style.backgroundPosition = reflectionSettings.background.position.x + 'px ' +
                                        reflectionSettings.background.position.y + 'px';
         }

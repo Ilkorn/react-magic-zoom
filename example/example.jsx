@@ -34,7 +34,12 @@ export class App extends React.Component {
                 position: {
                     left: '100%',
                     top: '10%'
+                },
+                size: {
+                    height: 100,
+                    width: 300
                 }
+
             };
 
         return (
