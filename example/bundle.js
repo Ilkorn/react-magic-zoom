@@ -226,6 +226,7 @@
 	        _this.handleMouseMoveOnImage = _this.handleMouseMoveOnImage.bind(_this);
 	        _this.handleMouseLeaveFromImage = _this.handleMouseLeaveFromImage.bind(_this);
 	        _this.handleMouseEnterOnImage = _this.handleMouseEnterOnImage.bind(_this);
+	        _this.handleStopEvent = _this.handleStopEvent.bind(_this);
 
 	        _this.delayedReflectionHandler = _lodash2.default.debounce(_this.reflectionSubscribersCall, 10);
 
@@ -465,6 +466,11 @@
 	            this.setState(state);
 	        }
 	    }, {
+	        key: 'handleStopEvent',
+	        value: function handleStopEvent(event) {
+	            event.stopPropagation();
+	        }
+	    }, {
 	        key: 'reflectionSubscribersCall',
 	        value: function reflectionSubscribersCall(element) {
 	            this.props.subscribeOnReflection && this.props.subscribeOnReflection(element);
@@ -618,7 +624,9 @@
 	            element = _react2.default.createElement('div', {
 	                ref: 'reflection',
 	                style: style,
-	                className: 'magic-zoom__reflection'
+	                className: 'magic-zoom__reflection',
+	                onMouseMove: this.handleMouseLeaveFromImage,
+	                onTouchMove: this.handleMouseLeaveFromImage
 	            });
 
 	            if (this.props.subscribeOnReflection) {

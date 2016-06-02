@@ -18,6 +18,7 @@ class MagicZoom extends React.Component {
         this.handleMouseMoveOnImage = this.handleMouseMoveOnImage.bind(this);
         this.handleMouseLeaveFromImage = this.handleMouseLeaveFromImage.bind(this);
         this.handleMouseEnterOnImage = this.handleMouseEnterOnImage.bind(this);
+        this.handleStopEvent = this.handleStopEvent.bind(this);
 
         this.delayedReflectionHandler = _.debounce(this.reflectionSubscribersCall, 10);
 
@@ -247,6 +248,10 @@ class MagicZoom extends React.Component {
         this.setState(state);
     }
 
+    handleStopEvent(event) {
+        event.stopPropagation();
+    }
+
     reflectionSubscribersCall(element) {
         this.props.subscribeOnReflection && this.props.subscribeOnReflection(element);
     }
@@ -410,6 +415,8 @@ class MagicZoom extends React.Component {
                 ref="reflection"
                 style={style}
                 className="magic-zoom__reflection"
+                onMouseMove={this.handleMouseLeaveFromImage}
+                onTouchMove={this.handleMouseLeaveFromImage}
             />
         );
 
