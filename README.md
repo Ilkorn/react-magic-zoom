@@ -1,13 +1,12 @@
-This component don’t have a third part dependency.
-Work correct for touch devices.
+This component doesn't have any third part dependencies, and works with touch events.
 
-**Here you can see [DEMO](http://ilkorn.github.io/react-magic-zoom/)**
+**You can see a [DEMO here](http://ilkorn.github.io/react-magic-zoom/)**
 
-####Usage:
+#### Usage:
 
 For use this component you should put inside it node with `<img>` tab with fill `src`:
 
-```
+```js
 require("!style!css!sass!../src/scss/_react-magic-zoom.scss");
 
 import React from ‘react’;
@@ -28,9 +27,9 @@ export class App extends React.Component {
 
 ReactDOM.render(<App/>, document.getElementById('app'));
 ```
-####Option:
+#### Options:
 
-```
+```js
 // Type 'auto' - autosize cursor and reflection,
 // 'donor' - not render
 type: 'auto',
